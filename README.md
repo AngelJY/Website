@@ -37,4 +37,7 @@ Your Pages site will use the layout and styles from the Jekyll theme you have se
 Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
 
 ### The First Test
-2008/1/25 [just a test](https://angeljy.github.io/Website/404)
+2008/1/25 [just a test](https://angeljy.github.io/Website/404.html)
+
+### The Figure You Want To See
+Yes,it is that! ![test](https://angeljy.github.io/Website/clap.gif)
