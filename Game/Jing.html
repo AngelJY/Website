@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>井字棋</title>
+    <style type="text/css">
+        #Back{
+            width:400px;
+            height: 400px;
+            background-image: url(img/back.png);
+        }
+        .smallDiv {
+            /*border: 1px solid pink;*/
+            width: 133.3px;
+            height: 133.3px;
+            float: left;
+        }
+        #player1{
+            font-family: "微软雅黑";
+            font-size: 25px;
+        }
+        #player2{
+            font-family: "微软雅黑";
+            font-size: 25px;
+        }
+        #button1{
+            font-family: "华文行楷";
+            font-size: 30px;
+        }
+        #button2{
+            font-family: "华文行楷";
+            font-size: 30px;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css" />
+    <script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+
+
+    <script type="text/javascript">
+        //一个boolean类型 的变量，看是否是下X
+        var Xon = true;
+        //一个数组，用于记录所有的位置里面的落子情况
+        var arrX = new Array(9);
+        //定义一个数组，里面存放的是boolean类型的，用于看该位置能不能下手
+        var arrCanPut = new Array(9);
+        var time;
+        var useTime=60;  //记录剩余时间
+        var OCount = 0;
+        var XCount = 0;
+        var flag = 0;   //是否和电脑对战
+        $(function(){
+
+        });
+
+        function PVP() {
+            init();
+        }
+
+        function PVE() {
+            flag = 1;
+            document.getElementById("player1").innerHTML="持X:辣鸡";
+            document.getElementById("player2").innerHTML="持O:爸爸";
+            init2();
+        }
+
+        function init() {
+
+            for(var i=0;i<9;i++)
+            {
+                $("#Back").append("<div id='" + i + "' class='smallDiv' onclick='getfun(" + i + ")'></div>");
+            }
+            for(var i = 0; i < arrX.length; i++) {
+                arrX[i] = 0;
+                arrCanPut[i] = true;
+            }
+            time=window.setInterval("showUseTime()",1000);
+            changePlayer();
+        }
+
+        function init2() {
+
+            for(var i=0;i<9;i++)
+            {
+                $("#Back").append("<div id='" + i + "' class='smallDiv' onclick='getfun2(" + i + ")'></div>");
+            }
+            for(var i = 0; i < arrX.length; i++) {
+                arrX[i] = 0;
+                arrCanPut[i] = true;
+            }
+            time=window.setInterval("showUseTime()",1000);
+            changePlayer();
+        }
+
+        /*
+                    * 当在棋盘中点击的时候，就执行这个方法
+                    */
+        function getfun(num) {
+            var i = parseInt(num);
+            if(arrX[i] != 0 || arrCanPut[i] == false) {
+                //如果已经落子了话，就不是0了，那么就不允许再落子
+                return;
+            }
+
+            if(Xon == false) {
+                $("#" + i).html("<img src='img/O.png' width='100%' height='100%'/>");
+                Xon = true;
+                OCount++;
+                //数组中O为1
+                arrX[i] = 1;
+            } else {
+                $("#" + i).html("<img src='img/X.png' width='100%' height='100%'/>");
+                Xon = false;
+                //数组中X为2
+                //X先手
+                arrX[i] = 2;
+                XCount++;
+            }
+
+            //此位置不能放东西
+            arrCanPut[i] = false;
+            changePlayer();
+            checkWin();
+        }
+
+        function getfun2(num) {
+            var i = parseInt(num);
+            if(arrX[i] != 0 || arrCanPut[i] == false) {
+                //如果已经落子了话，就不是0了，那么就不允许再落子
+                return;
+            }
+
+            if(Xon == false) {
+                $("#" + i).html("<img src='img/O.png' width='100%' height='100%'/>");
+                Xon = true;
+                OCount++;
+                //数组中O为1
+                arrX[i] = 1;
+            } else {
+                $("#" + i).html("<img src='img/X.png' width='100%' height='100%'/>");
+                Xon = false;
+                //数组中X为2
+                //X先手
+                arrX[i] = 2;
+                XCount++;
+            }
+            checkWin();
+            //此位置不能放东西
+            arrCanPut[i] = false;
+            var j = scan(i);
+            $("#" + j).html("<img src='img/O.png' width='100%' height='100%'/>");
+            Xon = true;
+            OCount++;
+            //数组中O为1
+            arrX[j] = 1;
+            checkWin();
+        }
+
+        function scan(k) {
+            //竖着
+            for(var i = 0; i <= 2; i++) {
+                if(arrX[i] == arrX[i + 3] &&arrX[i + 6]==0 && arrX[i]==2) {
+                    return i+6;
+                }
+                else if(arrX[i+6] == arrX[i + 3] &&arrX[i]==0&& arrX[i+3]==2 )
+                {
+                    return i;
+                }
+                else if(arrX[i] == arrX[i + 6] &&arrX[i + 3]==0&& arrX[i]==2 )
+                    return i+3;
+            }
+
+            //横着
+            for(var i = 0; i <= 6; i++) {
+                if(i % 3 > 0) {
+                    continue;
+                }
+                if(arrX[i] == arrX[i + 1] &&arrX[i + 2]==0&& arrX[i]==2) {
+                    return i+2;
+                }
+                else if(arrX[i+2] == arrX[i + 1] &&arrX[i]==0&& arrX[i+1]==2)
+                {
+                    return i;
+                }
+                else if(arrX[i] == arrX[i + 2] &&arrX[i + 1]==0&& arrX[i]==2)
+                {
+                    return i+1;
+                }
+            }
+
+            //左上角往右下角斜
+            for(var i = 0; i <= 0; i++) {
+                if(arrX[i] == arrX[i + 4] && arrX[i + 8]==0 && arrX[i]==2) {
+                    return i+8;
+                }
+                else if(arrX[i+8] == arrX[i + 4] && arrX[i]==0&& arrX[i+4]==2)
+                {
+                    return i;
+                }
+                else if(arrX[i] == arrX[i + 8] && arrX[i + 4]==0&& arrX[i]==2)
+                {
+                    return i+4;
+                }
+            }
+
+            //右上角往左下角斜
+            for(var i = 2; i <= 2; i++) {
+                if(arrX[i] == arrX[i + 2] && arrX[i + 4]==0&& arrX[i]==2) {
+                    return i+4;
+                }
+                else if(arrX[i] == arrX[i + 4] && arrX[i + 2]==0&& arrX[i]==2)
+                {
+                    return i+2;
+                }
+                else if(arrX[i+4] == arrX[i + 2] && arrX[i]==0&& arrX[i+2]==2)
+                {
+                    return i;
+                }
+            }
+            if(k>=0&&k<=2)
+            {
+                if(k==0)
+                {
+                    if(arrX[k+4]==0)
+                    {
+                        return k+4;
+                    }
+                    else if(arrX[k+1]==0)
+                    {
+                        return k+1;
+                    }
+                }
+                if(k == 2)
+                {
+                    if(arrX[k+2]==0)
+                    {
+                        return k+2;
+                    }
+                    else if(arrX[k-1]==0)
+                    {
+                        return k-1;
+                    }
+                }
+                if(arrX[k+3]==0)
+                {
+                    return k+3;
+                }
+            }
+            if(k>=6&&k<=8)
+            {
+                if(k==6)
+                {
+                    if(arrX[k-2]==0)
+                    {
+                        return k-2;
+                    }
+                    else if(arrX[k+1]==0)
+                    {
+                        return k+1;
+                    }
+                }
+                if(k == 8)
+                {
+                    if(arrX[k-4]==0)
+                    {
+                        return k-4;
+                    }
+                    else if(arrX[k-1]==0)
+                    {
+                        return k-1;
+                    }
+                }
+                if(arrX[k-3]==0)
+                {
+                    return k-3;
+                }
+            }
+            if(k>=3&&k<=5)
+            {
+                if(k==4)
+                {
+                    if(arrX[k-4]==0)
+                    {
+                        return k-4;
+                    }
+                    else if(k-2==0)
+                    {
+                        return k-2;
+                    }
+                    else if(k+2==0)
+                    {
+                        return k+2;
+                    }
+                    else if(k+4==0)
+                    {
+                        return k+4;
+                    }
+                }
+                if(k==3)
+                {
+                    if(arrX[k+1]==0)
+                    {
+                        return k+1;
+                    }
+                }
+                if(k == 5)
+                {
+                    if(arrX[k-1]==0)
+                    {
+                        return k-1;
+                    }
+                }
+                if(arrX[k+3]==0)
+                {
+                    return k+3;
+                }
+                else if(arrX[k-3]==0)
+                {
+                    return k-3;
+                }
+            }
+        }
+        function showUseTime(){
+            useTime=useTime-1;
+            $("#span2").html(useTime+"s");
+            if(useTime<=0){
+                clearInterval(time);
+                alert("时间到")
+                if(Xon){
+                    winthegame(1)
+                }else{
+                    winthegame(2)
+                }
+            }
+        }
+
+
+
+        /*
+			 * 改变当前输入显示,并且开始计时
+			 */
+        function changePlayer(){
+            if(Xon==false){
+                $("#span1").html("O");
+            }else{
+                $("#span1").html("X");
+            }
+            useTime=60;
+        }
+
+        /*
+			 * 此方法用于判断是否成功了。
+			 * 扫描每一行
+			 */
+        function checkWin() {
+            //竖着
+            for(var i = 0; i <= 2; i++) {
+                if(arrX[i] == 0) {
+                    continue;
+                }
+                if(arrX[i] == arrX[i + 3] && arrX[i] == arrX[i + 6] && arrX[i]!=0 ) {
+                    winthegame(arrX[i]);
+                }
+            }
+
+            //横着
+            for(var i = 0; i <= 6; i++) {
+                if(arrX[i] == 0) {
+                    continue;
+                }
+                if(i % 3 > 0) {
+                    continue;
+                }
+                if(arrX[i] == arrX[i + 1] && arrX[i] == arrX[i + 2]&& arrX[i]!=0) {
+
+                    winthegame(arrX[i]);
+                }
+            }
+
+            //左上角往右下角斜
+            for(var i = 0; i <= 0; i++) {
+                if(arrX[i] == arrX[i + 4] && arrX[i] == arrX[i + 8]&& arrX[i]!=0 ) {
+
+                    winthegame(arrX[i]);
+                }
+            }
+
+            //右上角往左下角斜
+            for(var i = 2; i <= 2; i++) {
+                if(arrX[i] == arrX[i + 2] && arrX[i] == arrX[i + 4]&& arrX[i]!=0) {
+
+                    winthegame(arrX[i]);
+                }
+            }
+            //和局的方式
+            if(OCount == 4 && XCount == 5&& arrX[i]!=0) {
+                winthegame(0);
+            }
+        }
+
+        /*
+			 * 赢了
+			 */
+        function winthegame(num) {
+            clearInterval(time);//清空倒计时器
+            $("#span1").html("");//清空执子显示
+            $("#span2").html("");//清空倒计时器
+            //黑子为2，白子为1,
+            if(flag==0)
+            {
+                if(num == 2) {
+                    alert("恭喜,X胜");
+                } else if(num == 1) {
+                    alert("恭喜,O胜！");
+                } else {
+                    alert("和局，请重新来过");
+                }
+            }
+           else {
+                if(num == 2) {
+                    alert("厉害惹");
+                } else if(num == 1) {
+                    alert("哈哈哈，爸爸最厉害");
+                } else {
+                    alert("和局，蓝瘦");
+                }
+            }
+            //将每个位置都设置为不能落子
+            for(var i = 0; i < arrCanPut.length; i++) {
+                arrCanPut[i] = false;
+            }
+            //将来这里要放自动刷新的功能
+            window.setTimeout("flashAndRestart()",2000);
+        }
+
+
+        function flashAndRestart(){
+            alert("请刷新页面重新开始！");
+            window.location.reload();
+        }
+
+
+
+    </script>
+
+</head>
+<body>
+
+
+    <div class="container-fluid">
+        <div class="col-md-3 col-lg-3">
+            <div style="border: 0px solid pink; width: 100%; height: 60px;" class="hidden-sm hidden-xs hidden-md"></div>
+            <div id="player2" style="border: 1px solid gray; width: 100%; height: 250px;"class="hidden-sm hidden-xs hidden-md">
+                执O玩家：player2
+            </div>
+            <div style="border: 0px solid gray; width: 100%; height: 150px;"class="hidden-sm hidden-xs hidden-md"></div>
+            <div style="border: 0px solid red; width: 100%; height: 50px;font-family: '微软雅黑';color: red;font-size: 25px;"class="hidden-sm hidden-xs hidden-md">
+                <div style="margin-left: 100px;">
+						<span style="color: black;">
+							当前落子：
+						</span>
+                    <span id="span1">
+						</span>
+                </div>
+                <div style="margin-left: 100px;">
+						<span style="color: black;">
+							剩余时间：
+						</span>
+                    <span id="span2">
+						</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-6">
+
+
+            <div id="Back"></div>
+            <br><br>
+            <button id="button1" onclick="PVP()">对阵玩家</button>&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <button id="button2" onclick="PVE()">对阵电脑</button>
+
+
+        </div>
+        <div class="col-md-3  col-lg-3 ">
+            <div style="border: 0px solid pink; width: 100%; height: 120px;" class="hidden-sm hidden-xs hidden-md">
+
+            </div>
+            <div style="border: 0px solid gray; width: 100%; height: 250px;"class="hidden-sm hidden-xs hidden-md">
+            </div>
+            <div id="player1"  style="border: 1px solid gray; width: 100%; height: 250px;"class="hidden-sm hidden-xs hidden-md">
+                执X玩家：player1
+            </div>
+        </div>
+    </div>
+</body>
+</html>
