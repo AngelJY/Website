@@ -5,14 +5,14 @@
     <title>井字棋</title>
     <style type="text/css">
         #Back{
-            width:400px;
-            height: 400px;
+            width:393px;
+            height: 403px;
             background-image: url(img/back.png);
         }
         .smallDiv {
             /*border: 1px solid pink;*/
-            width: 133.3px;
-            height: 133.3px;
+            width: 131px;
+            height: 134px;
             float: left;
         }
         #player1{
@@ -30,6 +30,18 @@
         #button2{
             font-family: "华文行楷";
             font-size: 30px;
+        }
+        #easy{
+            font-family: "华文行楷";
+            font-size: 30px;
+        }
+        #difficult{
+            font-family: "华文行楷";
+            font-size: 30px;
+        }
+        #DE{
+            font-family: "微软雅黑";
+            font-size: 25px;
         }
     </style>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
@@ -58,7 +70,20 @@
             init();
         }
 
-        function PVE() {
+        function JudgePVE() {
+            $("#Hard").append("<div id='DE'>难度</div>");
+            $("#Hard").append("<button id='easy' onclick='PVEE()'>简单</button>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;");
+            $("#Hard").append("<button id='difficult' onclick='PVEH()'>困难</button>");
+        }
+
+        function PVEE() {
+            flag = 1;
+            document.getElementById("player1").innerHTML="持X:辣鸡";
+            document.getElementById("player2").innerHTML="持O:爸爸";
+            init3();
+        }
+
+        function PVEH() {
             flag = 1;
             document.getElementById("player1").innerHTML="持X:辣鸡";
             document.getElementById("player2").innerHTML="持O:爸爸";
@@ -84,6 +109,20 @@
             for(var i=0;i<9;i++)
             {
                 $("#Back").append("<div id='" + i + "' class='smallDiv' onclick='getfun2(" + i + ")'></div>");
+            }
+            for(var i = 0; i < arrX.length; i++) {
+                arrX[i] = 0;
+                arrCanPut[i] = true;
+            }
+            time=window.setInterval("showUseTime()",1000);
+            changePlayer();
+        }
+
+        function init3() {
+
+            for(var i=0;i<9;i++)
+            {
+                $("#Back").append("<div id='" + i + "' class='smallDiv' onclick='getfun3(" + i + ")'></div>");
             }
             for(var i = 0; i < arrX.length; i++) {
                 arrX[i] = 0;
@@ -157,17 +196,51 @@
             checkWin();
         }
 
+
+        function getfun3(num) {
+            var i = parseInt(num);
+            if(arrX[i] != 0 || arrCanPut[i] == false) {
+                //如果已经落子了话，就不是0了，那么就不允许再落子
+                return;
+            }
+
+            if(Xon == false) {
+                $("#" + i).html("<img src='img/O.png' width='100%' height='100%'/>");
+                Xon = true;
+                OCount++;
+                //数组中O为1
+                arrX[i] = 1;
+            } else {
+                $("#" + i).html("<img src='img/X.png' width='100%' height='100%'/>");
+                Xon = false;
+                //数组中X为2
+                //X先手
+                arrX[i] = 2;
+                XCount++;
+            }
+            checkWin();
+            //此位置不能放东西
+            arrCanPut[i] = false;
+            var j = scan2(i);
+            $("#" + j).html("<img src='img/O.png' width='100%' height='100%'/>");
+            Xon = true;
+            OCount++;
+            //数组中O为1
+            arrX[j] = 1;
+            checkWin();
+        }
+
         function scan(k) {
             //竖着
             for(var i = 0; i <= 2; i++) {
-                if(arrX[i] == arrX[i + 3] &&arrX[i + 6]==0 && arrX[i]==2) {
+                if(arrX[i] == arrX[i + 3] &&arrX[i + 6]==0 && arrX[i]!=0) {
                     return i+6;
                 }
-                else if(arrX[i+6] == arrX[i + 3] &&arrX[i]==0&& arrX[i+3]==2 )
+                else if(arrX[i+6] == arrX[i + 3] &&arrX[i]==0&& arrX[i+3]!=0 )
                 {
                     return i;
                 }
-                else if(arrX[i] == arrX[i + 6] &&arrX[i + 3]==0&& arrX[i]==2 )
+                else if(arrX[i] == arrX[i + 6] &&arrX[i + 3]==0&& arrX[i]!=0 )
                     return i+3;
             }
 
@@ -176,14 +249,14 @@
                 if(i % 3 > 0) {
                     continue;
                 }
-                if(arrX[i] == arrX[i + 1] &&arrX[i + 2]==0&& arrX[i]==2) {
+                if(arrX[i] == arrX[i + 1] &&arrX[i + 2]==0&& arrX[i]!=0) {
                     return i+2;
                 }
-                else if(arrX[i+2] == arrX[i + 1] &&arrX[i]==0&& arrX[i+1]==2)
+                else if(arrX[i+2] == arrX[i + 1] &&arrX[i]==0&& arrX[i+1]!=0)
                 {
                     return i;
                 }
-                else if(arrX[i] == arrX[i + 2] &&arrX[i + 1]==0&& arrX[i]==2)
+                else if(arrX[i] == arrX[i + 2] &&arrX[i + 1]==0&& arrX[i]!=0)
                 {
                     return i+1;
                 }
@@ -191,14 +264,14 @@
 
             //左上角往右下角斜
             for(var i = 0; i <= 0; i++) {
-                if(arrX[i] == arrX[i + 4] && arrX[i + 8]==0 && arrX[i]==2) {
+                if(arrX[i] == arrX[i + 4] && arrX[i + 8]==0 && arrX[i]!=0) {
                     return i+8;
                 }
-                else if(arrX[i+8] == arrX[i + 4] && arrX[i]==0&& arrX[i+4]==2)
+                else if(arrX[i+8] == arrX[i + 4] && arrX[i]==0&& arrX[i+4]!=0)
                 {
                     return i;
                 }
-                else if(arrX[i] == arrX[i + 8] && arrX[i + 4]==0&& arrX[i]==2)
+                else if(arrX[i] == arrX[i + 8] && arrX[i + 4]==0&& arrX[i]!=0)
                 {
                     return i+4;
                 }
@@ -206,14 +279,14 @@
 
             //右上角往左下角斜
             for(var i = 2; i <= 2; i++) {
-                if(arrX[i] == arrX[i + 2] && arrX[i + 4]==0&& arrX[i]==2) {
+                if(arrX[i] == arrX[i + 2] && arrX[i + 4]==0&& arrX[i]!=0) {
                     return i+4;
                 }
-                else if(arrX[i] == arrX[i + 4] && arrX[i + 2]==0&& arrX[i]==2)
+                else if(arrX[i] == arrX[i + 4] && arrX[i + 2]==0&& arrX[i]!=0)
                 {
                     return i+2;
                 }
-                else if(arrX[i+4] == arrX[i + 2] && arrX[i]==0&& arrX[i+2]==2)
+                else if(arrX[i+4] == arrX[i + 2] && arrX[i]==0&& arrX[i+2]!=0)
                 {
                     return i;
                 }
@@ -320,6 +393,24 @@
                     return k-3;
                 }
             }
+        }
+        function scan2(k) {
+            for(var i = 0;i<30;i++)
+            {
+                j = Math.floor(Math.random()*10);
+                if(k==9)
+                {
+                    k=0;
+                }
+                if(arrX[k]==0)
+                    return k;
+            }
+            for(var i= 0;i<9;i++)
+            {
+                if(arrX[i]==0)
+                    return i;
+            }
+
         }
         function showUseTime(){
             useTime=useTime-1;
@@ -431,7 +522,7 @@
                 arrCanPut[i] = false;
             }
             //将来这里要放自动刷新的功能
-            window.setTimeout("flashAndRestart()",2000);
+            window.setTimeout("flashAndRestart()",100);
         }
 
 
@@ -477,9 +568,11 @@
 
             <div id="Back"></div>
             <br><br>
+            <div id="Hard">
             <button id="button1" onclick="PVP()">对阵玩家</button>&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-            <button id="button2" onclick="PVE()">对阵电脑</button>
 
+                <button id="button2" onclick="JudgePVE()">对阵电脑</button>
+            </div>
 
         </div>
         <div class="col-md-3  col-lg-3 ">
